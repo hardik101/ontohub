@@ -8,6 +8,7 @@ class LinksController < InheritedResources::Base
   has_scope :search
   belongs_to :ontology, :optional => true
   load_and_authorize_resource :except => [:index, :show]
+  before_filter :check_read_permissions
 
   def index
     super do |format|
@@ -54,4 +55,16 @@ class LinksController < InheritedResources::Base
     @link = Link.new params[:link]
   end
   
+  def check_read_permissions
+    if params[:action] == 'index'
+      authorize! :show, Repository.find_by_path(params[:repository_id])
+    else
+      if resource.source
+        authorize! :show, resource.source.repository
+      end
+      if resource.target
+        authorize! :show, resource.target.repository
+      end
+    end
+  end
 end

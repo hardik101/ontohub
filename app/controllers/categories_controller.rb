@@ -1,5 +1,6 @@
 class CategoriesController < InheritedResources::Base
   belongs_to :ontology, :optional => true
+  before_filter :check_read_permissions
     def index
       if params[:ontology_id]
         @ontology = Ontology.find(params[:ontology_id])
@@ -21,5 +22,10 @@ class CategoriesController < InheritedResources::Base
       end
       @ontologies = Ontology.find(:all, :joins => :categories, :conditions => "categories.id IN (#{categories *","})")
     end
-    
+
+  protected
+
+  def check_read_permissions
+    authorize! :show, parent.repository
+  end
 end
