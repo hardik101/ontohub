@@ -64,7 +64,7 @@ class FilesController < ApplicationController
     if build_file.valid?
       repository.save_file @file.file.path, @file.filepath, @file.message, current_user
       flash[:success] = "Successfully saved uploaded file."
-      redirect_to fancy_repository_path(repository, path: @file.path)
+      redirect_to fancy_repository_path(repository, path: @file.filepath)
     else
       render :new
     end
@@ -81,7 +81,8 @@ class FilesController < ApplicationController
   end
 
   def build_file
-    @file ||= UploadFile.new(params[:upload_file])
+    args = params[:upload_file].merge({repository: repository}) unless params[:upload_file].nil?
+    @file ||= UploadFile.new(args)
   end
 
   def check_permissions
