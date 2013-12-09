@@ -1,6 +1,12 @@
 #!/bin/bash
+# install script for Ubuntu 12.04 LTS
 
-
+# first argument is branch that will be used. Default is master
+BRANCH=$1
+if [[ "x$BRANCH" == "x" ]]; then
+  BRANCH=master
+fi
+echo Installing Ontohub, branch $BRANCH
 
 
 echo "Install Ontohub dependencies? (y|n): "
@@ -8,12 +14,13 @@ read answer
 if [[ "$answer" == "y" ]]; then
 
   # Apt Installer
+  sudo apt-get install python-software-properties
   sudo apt-add-repository ppa:hets/hets
   #sudo apt-add-repository "deb http://ppa.launchpad.net/hets/hets/ubuntu precise main"
   sudo apt-get update
 
   # Apt Intall
-  sudo apt-get install -y build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion postgresql libpq-dev redis-server hets libqtwebkit-dev
+  sudo apt-get install -y build-essential openssl libreadline6 libreadline6-dev curl git-core zlib1g zlib1g-dev libssl-dev libyaml-dev libsqlite3-0 libsqlite3-dev sqlite3 libxml2-dev libxslt-dev autoconf libc6-dev ncurses-dev automake libtool bison subversion postgresql libpq-dev redis-server hets libqtwebkit-dev qt4-qmake libqtwebkit4 libqtwebkit-dev libpq-dev
 
   # Hets Update
   sudo hets -update
@@ -26,7 +33,11 @@ if [[ "$answer" == "y" ]]; then
   sudo adduser $USER rvm
 
   # Workarounds
-  sudo ln -s /lib/x86_64-linux-gnu/libpng12.so.0 /lib/x86_64-linux-gnu/libpng14.so.14
+  pushd /lib
+  DIR=$(ls -d *-linux-gnu)
+  popd
+  echo $DIR
+  sudo ln -s /lib/$DIR/libpng12.so.0 /lib/$DIR/libpng14.so.14
 
   # Feedback
   echo "The dependencies are installed!"
@@ -51,9 +62,10 @@ if [[ "$answer" == "y" ]]; then
   cd $HOME
   mkdir Workspace
   cd Workspace
-  git clone git@github.com:ontohub/ontohub.git
+  git clone https://github.com/ontohub/ontohub.git
   mv ontohub Ontohub
   cd Ontohub
+  git checkout $BRANCH
 
   # Install bundler and ontohub dependencies
   gem install bundler
@@ -115,5 +127,5 @@ EOF
 
   # Feedback
   echo "Ontohub is configured!"
-
+  echo "Try 'rails s', and then enter 'localhost:3000' into your browser"
 fi
