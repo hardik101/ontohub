@@ -33,10 +33,8 @@ module StateUpdater
   end
 
   def update_state!(state, error_message = nil)
-    update_attributes! \
-      state:      state.to_s,
-      last_error: error_message
-
+    self.state      = state.to_s
+    self.last_error = error_message
     save!
   end
 end
