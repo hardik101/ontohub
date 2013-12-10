@@ -1,4 +1,5 @@
 class LicenseModelsController < InheritedResources::Base
+
   belongs_to :ontology
   before_filter :check_read_permissions
 
