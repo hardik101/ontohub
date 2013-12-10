@@ -13,10 +13,11 @@ class EntitiesController < InheritedResources::Base
 
   def index
     ontology = Ontology.find params[:ontology_id]
-    if ontology.logic.name == "OWL2" || ontology.logic.name == "OWL"
+    logic = ontology.logic
+    if logic && (logic.name == "OWL2" || logic.name == "OWL")
       if ontology
         begin
-          @nodes = ontology.entities.first.roots.first.children
+          @nodes = ontology.entities.where(kind: 'Class').first.roots.first.children
         rescue
           @nodes = []
         end
