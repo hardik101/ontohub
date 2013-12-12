@@ -1,6 +1,7 @@
 class LicenseModelsController < InheritedResources::Base
 
   belongs_to :ontology
+
   before_filter :check_read_permissions
 
   def index
@@ -68,4 +69,5 @@ class LicenseModelsController < InheritedResources::Base
   def check_read_permissions
     authorize! :show, parent.repository
   end
+
 end
