@@ -14,7 +14,7 @@ read answer
 if [[ "$answer" == "y" ]]; then
 
   # Apt Installer
-  sudo apt-get install python-software-properties
+  sudo apt-get install -y python-software-properties
   sudo apt-add-repository ppa:hets/hets
   #sudo apt-add-repository "deb http://ppa.launchpad.net/hets/hets/ubuntu precise main"
   sudo apt-get update
@@ -127,5 +127,6 @@ EOF
 
   # Feedback
   echo "Ontohub is configured!"
-  echo "Try 'rails s', and then enter 'localhost:3000' into your browser"
+  echo "You have to start a new shell though (just type: bash) and cd into Workspace/Ontohub"
+  echo "Then try 'rails s', and then enter 'localhost:3000' into your browser"
 fi
