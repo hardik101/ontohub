@@ -67,8 +67,7 @@ module NavigationHelper
       resource:           ontology,
       current_page:       current_page,
       pages:              pages,
-      additional_actions: [],
-      files:              ontology.repository.paths_starting_with(ontology.basepath)
+      additional_actions: []
     }
   end
      
