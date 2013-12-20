@@ -34,7 +34,14 @@ class Ontology < ActiveRecord::Base
   has_many :target_links, class_name: 'Link', foreign_key: 'target_id', dependent: :destroy
   has_many :alternative_iris, dependent: :destroy
 
-  attr_accessible :iri, :name, :description, :logic_id, :category_ids, :documentation, :acronym, :file_extension, :projects, :present, :alternative_iris, :ontology_type_id
+  attr_accessible \
+  :acronym, :name, :description,
+  :logic_id, :ontology_type_id, :category_ids,
+  :documentation,
+  :file_extension,
+  :present,
+  :projects,
+  :iri, :alternative_iris
 
   validates_uniqueness_of :iri, :if => :iri_changed?
   validates_format_of :iri, :with => URI::regexp(Settings.allowed_iri_schemes)
