@@ -9,6 +9,12 @@
       DOL
   = resource.acronym
 
+- if resource.ontology_type
+  %small
+    %p
+      Ontology Type:
+      = fancy_link resource.ontology_type
+
 %small
   Defined
   - if resource.parent
