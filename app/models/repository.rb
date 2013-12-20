@@ -43,9 +43,12 @@ class Repository < ActiveRecord::Base
     versions = self.ontologies.map{|o| o.versions.last}.compact
     failed_versions = versions.select{|v| v.state!="done"}.group_by do |v|
       err = v.state+": "+v.last_error.to_s
-      if err.include?("exited with status")
+      errlines = err.split("\n")
+      if !(ind=errlines.index("*** Error:")).nil? and !errlines[ind+1].blank?
+        errlines[ind+1]
+      elsif err.include?("exited with status")
         then err[0,50]+" ... "+err.match("exited with status.*")[0]
-      else err.split("\n").first
+      else errlines.first
       end
     end
     failed_versions
