@@ -51,6 +51,10 @@ class Ontology < ActiveRecord::Base
 
   scope :list, includes(:logic).order('ontologies.state asc, ontologies.entities_count desc')
 
+  def self.find_by_file(file)
+    s_find_by_file(file).first
+  end
+
   def to_s
     name? ? name : iri
   end
@@ -107,5 +111,9 @@ class Ontology < ActiveRecord::Base
 
     ontology
   end
+
+  protected
+
+  scope :s_find_by_file, ->(file) { where("ontologies.basepath = :basepath AND ontologies.file_extension = :file_extension AND parent_id IS NULL", basepath: File.basepath(file), file_extension: File.extname(file)) }
 
 end
