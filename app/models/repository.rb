@@ -39,6 +39,28 @@ class Repository < ActiveRecord::Base
     path
   end
 
+  # list all failed versions, grouped by their errors
+  def show_failed_ontology_versions
+    versions = self.ontologies.map{|o| o.versions.last}.compact
+    failed_versions = versions.select{|v| v.state!="done"}.group_by do |v|
+      err = v.state+": "+v.last_error.to_s
+      errlines = err.split("\n")
+      if !(ind=errlines.index("*** Error:")).nil? and !errlines[ind+1].blank?
+        out = errlines[ind+1]
+        i=2
+        while !errlines[ind+i].include?("hets: user error") do
+          out += " "+errlines[ind+i] 
+          i+=1
+        end
+        out.sub(URI.regexp,"...").sub(/ \/[A-Za-z0-9\/.]*/," ...")
+      elsif err.include?("exited with status")
+        then err[0,50]+" ... "+err.match("exited with status.*")[0]
+      else errlines.first
+      end
+    end
+    failed_versions
+  end
+
   private
 
   def clear_readers
