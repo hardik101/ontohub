@@ -1,8 +1,8 @@
 class CategoriesController < InheritedResources::Base
 
-  belongs_to :ontology, :optional => true
+  belongs_to :ontology, optional: true
 
-  before_filter :check_read_permissions
+  load_and_authorize_resource
 
   def index
     if params[:ontology_id]
@@ -20,14 +20,6 @@ class CategoriesController < InheritedResources::Base
   def show
     @category = Category.find(params[:id])
     @ontologies = @category.related_ontologies
-  end
-
-  protected
-
-  def check_read_permissions
-    if parent
-      authorize! :show, parent.repository
-    end
   end
 
 end
