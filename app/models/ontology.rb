@@ -15,12 +15,10 @@ class Ontology < ActiveRecord::Base
   include Ontology::Distributed
   include Ontology::Categories
   include Ontology::Oops
-  include Ontology::OntologyTypes
   include Ontology::Projects
   include Ontology::Tools
   include Ontology::Tasks
   include Ontology::LicenseModels
-  include Ontology::FormalityLevels
   include Ontology::FileExtensions
   include Ontology::Searching
 
@@ -30,13 +28,15 @@ class Ontology < ActiveRecord::Base
   belongs_to :repository
   belongs_to :language
   belongs_to :logic, counter_cache: true
+  belongs_to :ontology_type
   has_many :source_links, class_name: 'Link', foreign_key: 'source_id', dependent: :destroy
   has_many :target_links, class_name: 'Link', foreign_key: 'target_id', dependent: :destroy
   has_many :alternative_iris, dependent: :destroy
+  has_and_belongs_to_many :formality_levels
 
   attr_accessible \
   :acronym, :name, :description,
-  :logic_id, :ontology_type_id, :category_ids,
+  :logic_id, :ontology_type_id, :category_ids, :formality_level_ids,
   :documentation,
   :file_extension,
   :present,
