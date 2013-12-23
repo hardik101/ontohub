@@ -5,3 +5,7 @@ exception_notifier:
   enabled: false
 
 display_head_commit: true
+
+git:
+  user: git
+  group: ontohub
