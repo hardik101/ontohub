@@ -57,29 +57,7 @@ class OntologySearch
 
   def make_global_keyword_list(prefix)
     text_list = Set.new
-
-    Ontology.select(:name).where("name ILIKE :prefix", prefix: "#{prefix}%").limit(25).group("name").limit(5).each do |ontology|
-      text_list.add(ontology.name)
-    end
-
-    Entity.select("display_name").where("display_name ILIKE :prefix", prefix: "#{prefix}%").limit(25).group("display_name").limit(5).each do |symbol|
-      text_list.add(symbol.display_name)
-    end
-
-    Entity.select("name").where("name ILIKE :prefix", prefix: "#{prefix}%").limit(25).group("name").limit(5).each do |symbol|
-      text_list.add(symbol.name)
-    end
-
-    Entity.select("text").where("text ILIKE :prefix", prefix: "#{prefix}%").limit(25).group("text").limit(5).each do |symbol|
-      text_list.add(symbol.text)
-    end
-
-    Logic.where("name ILIKE :prefix", prefix: "#{prefix}%").limit(5).each do |logic|
-      if logic.ontologies.size != 0
-        text_list.add(logic.name)
-      end
-    end
-
+    text_list.add(prefix)
     text_list.to_a.sort.map { |x| {text: x} }
   end
 

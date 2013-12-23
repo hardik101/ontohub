@@ -5,6 +5,9 @@ Ontohub::Application.routes.draw do
   
   resources :categories, :only => [:index, :show]
 
+  resources :ontology_types, only: :show
+  resources :formality_levels, only: :show
+
   devise_for :users, :controllers => { :registrations => "users/registrations" }
   resources :users, :only => :show
   resources :keys, except: [:show, :edit, :update]
@@ -41,6 +44,7 @@ Ontohub::Application.routes.draw do
 
   namespace :api, defaults: { format: 'json' } do
     namespace :v1 do
+      resources :categories,   only: [:index]
       resources :repositories, only: [:index, :update]
       resources :ontologies,   only: [:index, :update]
     end
@@ -70,6 +74,7 @@ Ontohub::Application.routes.draw do
     resources :ssh_access, :only => :index
     resources :permissions, :only => [:index, :create, :update, :destroy]
     resources :url_maps, except: :show
+    resources :errors, :only => :index
 
     resources :ontologies, only: [:index, :show, :edit, :update] do
       collection do
@@ -99,6 +104,7 @@ Ontohub::Application.routes.draw do
       resources :metadata, :only => [:index, :create, :destroy]
       resources :comments, :only => [:index, :create, :destroy]
       resources :graphs, :only => [:index]
+      resources :formality_levels, :only => [:index]
 
     end
 

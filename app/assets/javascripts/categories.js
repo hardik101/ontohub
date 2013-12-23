@@ -12,7 +12,7 @@ $(function () {
       icons: false
     }
   });
-}); 
+});
 $(function () {
         $("#tree").jstree({
           "plugins" : [  "themes", "html_data", "sort", "ui" ],
@@ -22,7 +22,7 @@ $(function () {
             dots: false
           }
     });
-}); 
+});
 $("#tree").delegate("a","click", function(e) {
   document.location.href = this;
 });

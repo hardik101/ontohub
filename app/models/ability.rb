@@ -11,6 +11,15 @@ class Ability
     elsif user.id
       # Repositories
       can [:create], Repository
+      can :show, Repository do |subject|
+        if subject.is_private
+          subject.permission?(:reader, user) ||
+          subject.permission?(:editor, user) ||
+          subject.permission?(:owner, user)
+        else
+          true
+        end
+      end
       can [:write], Repository do |subject|
         subject.permission?(:editor, user)
       end
@@ -96,7 +105,12 @@ class Ability
         # TODO tests written?
         subject.user == user || subject.metadatable.permission?(:editor, user)
       end
-      
+    else
+      can :show, Repository do |subject|
+        !subject.is_private
+      end
+
+      can :read, Category
     end
     
     # See the wiki for details: https://github.com/ryanb/cancan/wiki/Defining-Abilities

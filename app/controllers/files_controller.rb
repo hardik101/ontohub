@@ -1,7 +1,9 @@
 class FilesController < ApplicationController
 
   helper_method :repository, :ref, :oid, :path, :branch_name
-  before_filter :check_permissions, only: [:new, :create]
+  before_filter :check_write_permissions, only: [:new, :create]
+  before_filter :check_read_permissions
+
 
   def files
     @info = repository.path_info(params[:path], oid)
@@ -63,7 +65,11 @@ class FilesController < ApplicationController
     if build_file.valid?
       repository.save_file @file.file.path, @file.filepath, @file.message, current_user
       flash[:success] = "Successfully saved uploaded file."
-      redirect_to fancy_repository_path(repository, path: @file.path)
+      if ontology = repository.ontologies.find_by_file(@file.filepath)
+        redirect_to edit_repository_ontology_path(repository, ontology)
+      else
+        redirect_to fancy_repository_path(repository, path: @file.filepath)
+      end
     else
       render :new
     end
@@ -80,10 +86,15 @@ class FilesController < ApplicationController
   end
 
   def build_file
-    @file ||= UploadFile.new(params[:upload_file])
+    args = params[:upload_file].merge({repository: repository}) unless params[:upload_file].nil?
+    @file ||= UploadFile.new(args)
   end
 
-  def check_permissions
+  def check_read_permissions
+    authorize! :show, repository
+  end
+
+  def check_write_permissions
     authorize! :write, repository
   end
 
@@ -97,7 +108,7 @@ class FilesController < ApplicationController
   end
 
   def oid
-    @oid ||= commit_id[:oid]
+    @oid ||= commit_id[:oid] unless commit_id.nil?
   end
 
   def branch_name
