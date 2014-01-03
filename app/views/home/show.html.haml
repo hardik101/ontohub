@@ -1,17 +1,2 @@
-.alert
-  %button.close{type: 'button', :'data-dismiss' => 'alert'}
-    &times;
-  %strong
-    Coming soon!
-  In a few days you will see a completely refactored version of Ontohub.
-
-%h2= @page_title = 'Welcome!'
-
-.row
-  .span8
-    = render :partial => 'versions'
-    .row
-      .span12
-        = render :partial => 'comments'
-  .span4
-    = render :partial => 'about'
+- @page_title = 'Home'
+= render partial: 'versions'

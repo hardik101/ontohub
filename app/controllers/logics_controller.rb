@@ -24,8 +24,10 @@ class LogicsController < InheritedResources::Base
   end
   
   def show
+    @tab = params[:tab].try(:to_sym)
     super do |format|
       format.html do
+        @depth = params[:depth] ? params[:depth].to_i : 3
         @mappings_from = resource.mappings_from
         @mappings_to = resource.mappings_to
         @ontologies = resource.ontologies

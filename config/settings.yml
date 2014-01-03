@@ -28,7 +28,7 @@ allow_unconfirmed_access_for_days: 3
 
 # Footer links and texts
 footer:
-  - text: Copyright © 2012, 2013 Universität Bremen
+  - text: Copyright © 2012-2014 Universität Bremen
   - text: Released under the terms of GNU AGPL 3.0
     href: http://www.gnu.org/licenses/agpl-3.0.html
   - text: Ontohub code on GitHub
@@ -42,7 +42,10 @@ exception_notifier:
   email_prefix: "[ontohub exception]"
   sender_address: "exceptions@ontohub.org"
   exception_recipients:
-    - exceptions@ontohub.org
+    - ontohub-exceptions-l@ovgu.de
+
+git:
+  verify_url: http://localhost/
 
 allowed_iri_schemes:
   - http
@@ -50,3 +53,11 @@ allowed_iri_schemes:
   - file
   - gopher
   - urn
+
+display_head_commit: false
+display_symbols_tab: false
+
+external_repository_name: 'External'
+fallback_commit_user: 'ontohub_system'
+fallback_commit_email: 'ontohub_system@ontohub.org'
+
