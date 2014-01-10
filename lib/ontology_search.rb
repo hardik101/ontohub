@@ -5,7 +5,7 @@ require 'json'
 #
 class OntologySearch
 
-  class Response < Struct.new(:page,:resultsInPage,:resultsInSet,:results)
+  class Response < Struct.new(:page,:ontologiesPerPage,:ontologiesInSet,:ontologies)
   end
 
   def initialize
@@ -61,49 +61,42 @@ class OntologySearch
     text_list.to_a.sort.map { |x| {text: x} }
   end
 
-  def make_repository_bean_list_json(repository, keyword_list, page)
-    JSON.generate(make_repository_bean_list_response(repository, keyword_list, page))
+  def make_bean_list_json(repository, keyword_list, page)
+    JSON.generate(make_bean_list_response(repository, keyword_list, page))
   end
 
-  def make_global_bean_list_json(keyword_list, page)
-    JSON.generate(make_global_bean_list_response(keyword_list, page))
-  end
-
-  def make_repository_bean_list_response(repository, keyword_list, page)
-    # Display all repository ontologies for empty keyword list
-    if keyword_list.size == 0
-      offset = (page - 1) * @limit
-      bean_list_factory = OntologyBeanListFactory.new
-      repository.ontologies.limit(@limit).offset(offset).each do |ontology|
-        bean_list_factory.add_small_bean(ontology)
+  def select_item_list(keyword_list, type_name)
+    item_list = Array.new
+    keyword_list.each do |keyword|
+      if keyword["type"] == type_name
+        item_list.push keyword["item"]
       end
-      return Response.new(page, @limit, repository.ontologies.count, bean_list_factory.bean_list)
     end
-
-    index = 0
-    bean_list_factory = OntologyBeanListFactory.new
-    search = Ontology.search_by_keywords_in_repository(keyword_list, page, repository)
-    search.results.each do |ontology|
-      bean_list_factory.add_small_bean(ontology)
-    end
-
-    Response.new(page, @limit, search.total, bean_list_factory.bean_list)
+    item_list
   end
 
-  def make_global_bean_list_response(keyword_list, page)
-
-    # Display all ontologies for empty keyword list
-    if keyword_list.size == 0
-      offset = (page - 1) * @limit
-      bean_list_factory = OntologyBeanListFactory.new
-      Ontology.limit(@limit).offset(offset).each do |ontology|
-        bean_list_factory.add_small_bean(ontology)
+  def select_item(keyword_list, type_name, type)
+    keyword_list.each do |keyword|
+      if keyword["type"] == type_name
+        if keyword["item"].nil?
+          return nil
+        else
+          return type.find_by_id(keyword["item"].to_i)
+        end
       end
-      return Response.new(page, @limit, Ontology.count, bean_list_factory.bean_list)
     end
+    nil
+  end
+
+  def make_bean_list_response(repository, keyword_list, page)
+    mixed_list = select_item_list(keyword_list, 'Mixed')
+    ontology_type = select_item(keyword_list, 'OntologyType', OntologyType)
+    formality_level = select_item(keyword_list, 'FormalityLevel', FormalityLevel)
+    license_model = select_item(keyword_list, 'LicenseModel', LicenseModel)
+    task = select_item(keyword_list, 'Task', Task)
 
     bean_list_factory = OntologyBeanListFactory.new
-    search = Ontology.search_by_keywords(keyword_list, page)
+    search = Ontology.search_by_keywords(mixed_list, page, repository, nil, ontology_type, formality_level, license_model, task)
     search.results.each do |ontology|
       bean_list_factory.add_small_bean(ontology)
     end
