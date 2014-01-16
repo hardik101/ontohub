@@ -62,39 +62,15 @@ class Ontology < ActiveRecord::Base
 
   scope :list, includes(:logic).order('ontologies.state asc, ontologies.entities_count desc')
 
-  def self.find_by_file(file)
-    s_find_by_file(file).first
+
+  scope :find_with_path, ->(path) do
+    where "ontologies.basepath = :basepath AND ontologies.file_extension = :file_extension",
+      basepath: File.basepath(path),
+      file_extension: File.extname(path)
   end
 
-  def to_s
-    name? ? name : iri
-  end
+  scope :parents_first, order('(CASE WHEN ontologies.parent_id IS NULL THEN 1 ELSE 0 END) DESC, ontologies.parent_id asc')
 
-  # title for links
-  def title
-    name? ? iri : nil
-  end
-
-  def symbols
-    entities
-  end
-
-  def symbols_count
-    entities_count
-  end
-
-  def path
-    "#{basepath}#{file_extension}"
-  end
-
-  def iri_for_child(child_name)
-    child_name = child_name[1..-2] if child_name[0] == '<'
-    child_name.include?("://") ? child_name : "#{iri}?#{child_name}"
-  end
-
-  def is?(logic_name)
-    self.logic ? (self.logic.name == logic_name) : false
-  end
 
   def generate_name(name)
     match = name.match(%r{
@@ -112,6 +88,45 @@ class Ontology < ActiveRecord::Base
     else
       name
     end
+  end
+
+  def iri_for_child(child_name)
+    child_name = child_name[1..-2] if child_name[0] == '<'
+    child_name.include?("://") ? child_name : "#{iri}?#{child_name}"
+  end
+
+  def is?(logic_name)
+    self.logic ? (self.logic.name == logic_name) : false
+  end
+
+  def owl?
+    self.is?('OWL') || self.is?('OWL2')
+  end
+
+  def path
+    "#{basepath}#{file_extension}"
+  end
+
+  def symbols
+    entities
+  end
+
+  def symbols_count
+    entities_count
+  end
+
+  def to_s
+    name? ? name : iri
+  end
+
+  # Title for links
+  def title
+    name? ? iri : nil
+  end
+
+
+  def self.find_by_file(file)
+    s_find_by_file(file).first
   end
 
   def self.find_with_iri(iri)
