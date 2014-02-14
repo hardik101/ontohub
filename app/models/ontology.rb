@@ -21,6 +21,7 @@ class Ontology < ActiveRecord::Base
   include Ontology::LicenseModels
   include Ontology::FileExtensions
   include Ontology::Searching
+  include GraphStructures::SpecificFetchers::Links
 
   # Multiple Class Features
   include Aggregatable
@@ -150,6 +151,16 @@ class Ontology < ActiveRecord::Base
   def imported_by
     import_links.map(&:target)
   end
+
+  def imported_ontologies
+    fetch_links_by_kind(self, 'import')
+  end
+
+  def combined_sentences
+    affected_ontology_ids = [self.id] + imported_ontologies.pluck(:id)
+    Sentence.where(ontology_id: affected_ontology_ids)
+  end
+
 
   protected
 
