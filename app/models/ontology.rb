@@ -26,6 +26,8 @@ class Ontology < ActiveRecord::Base
   # Multiple Class Features
   include Aggregatable
 
+  class DeleteError < StandardError; end
+
   belongs_to :language
   belongs_to :logic, counter_cache: true
   belongs_to :ontology_type
@@ -149,7 +151,20 @@ class Ontology < ActiveRecord::Base
   end
 
   def imported_by
-    import_links.map(&:target)
+    import_links.map(&:source)
+  end
+
+  def destroy_with_parent
+    if parent
+      parent.destroy
+    else
+      destroy
+    end
+  end
+
+  def destroy
+    raise DeleteError if is_imported?
+    super
   end
 
   def imported_ontologies
