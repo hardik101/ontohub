@@ -11,35 +11,6 @@ describe Ontology do
     end
   end
 
-  context 'when trying to get the imported ontologies' do
-    let!(:ontology) { create :ontology }
-    let!(:imported_ontology) do
-      imported = create :single_ontology
-      create :import_link, source: ontology, target: imported
-      imported
-    end
-
-    it 'should fetch immediately imported ontologies' do
-      expect(ontology.imported_ontologies).to include(imported_ontology)
-      expect(ontology.imported_ontologies.size).to be(1)
-    end
-
-    context 'which have imports themselves' do
-      let!(:imported_imported_ontology) do
-        imported = create :single_ontology
-        create :import_link, source: imported_ontology, target: imported
-        imported
-      end
-
-      it 'should fetch all imported ontologies' do
-        expect(ontology.imported_ontologies).to include(imported_ontology)
-        expect(ontology.imported_ontologies).
-          to include(imported_imported_ontology)
-        expect(ontology.imported_ontologies.size).to be(2)
-      end
-
-    end
-
   context 'when deleting' do
     context 'a general ontology' do
       let(:ontology) { create :ontology }
@@ -91,6 +62,36 @@ describe Ontology do
         create :link, source: importing, target: ontology, kind: 'import'
         expect { ontology.destroy_with_parent }.to raise_error(Ontology::DeleteError)
       end
+    end
+  end
+
+  context 'when trying to get the imported ontologies' do
+    let!(:ontology) { create :ontology }
+    let!(:imported_ontology) do
+      imported = create :single_ontology
+      create :import_link, source: ontology, target: imported
+      imported
+    end
+
+    it 'should fetch immediately imported ontologies' do
+      expect(ontology.imported_ontologies).to include(imported_ontology)
+      expect(ontology.imported_ontologies.size).to be(1)
+    end
+
+    context 'which have imports themselves' do
+      let!(:imported_imported_ontology) do
+        imported = create :single_ontology
+        create :import_link, source: imported_ontology, target: imported
+        imported
+      end
+
+      it 'should fetch all imported ontologies' do
+        expect(ontology.imported_ontologies).to include(imported_ontology)
+        expect(ontology.imported_ontologies).
+          to include(imported_imported_ontology)
+        expect(ontology.imported_ontologies.size).to be(2)
+      end
+
     end
   end
 
