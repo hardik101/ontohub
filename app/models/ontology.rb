@@ -26,7 +26,7 @@ class Ontology < ActiveRecord::Base
   # Multiple Class Features
   include Aggregatable
 
-  class DeleteError < StandardError; end
+  class Ontology::DeleteError < StandardError; end
 
   belongs_to :language
   belongs_to :logic, counter_cache: true
@@ -165,7 +165,7 @@ class Ontology < ActiveRecord::Base
   end
 
   def destroy
-    raise DeleteError if is_imported?
+    raise Ontology::DeleteError if is_imported? && !repository.is_destroying
     super
   end
 
@@ -178,8 +178,6 @@ class Ontology < ActiveRecord::Base
     Sentence.where(ontology_id: affected_ontology_ids)
   end
 
-
-  protected
 
   scope :s_find_by_file, ->(file) do
     where "ontologies.basepath = :basepath AND ontologies.file_extension = :file_extension AND ontologies.parent_id IS NULL",
