@@ -10,9 +10,8 @@ module NavigationHelper
 
     pages << [:ontologies,       [*chain, :ontologies]]
     pages << [:"File browser", [*chain, :tree]]
-    pages << [:"URL catalog",  repository_url_maps_path(resource)]
     pages << [:history,          repository_ref_path(resource, 'master', path: nil, action: :history)]
-    pages << [:errors,           repository_errors_path(resource)]
+    pages << [:settings,  repository_repository_settings_path(resource)]
     pages << [:permissions,      [*chain, :permissions]] if can? :permissions, resource
  
     subnavigation(resource, pages, current_page, [], options)
@@ -66,7 +65,7 @@ module NavigationHelper
     }
   end
      
-  def subnavigation(resource, pages, current_page, additional_actions = [], options = {})
+  def subnavigation(resource, pages, current_page, additional_actions = [], options = {}, partial = '/shared/subnavigation')
     # Add counters
     pages.each do |row|
       counter_key = "#{row[0]}_count"
@@ -76,7 +75,7 @@ module NavigationHelper
     @page_title = current_page
     @page_title = "#{current_page.capitalize} · #{@page_title}" if current_page != pages[0][0]
     
-    render :partial => '/shared/subnavigation', :locals => {
+    render :partial => partial, :locals => {
       resource:           resource,
       current_page:       current_page,
       pages:              pages,
@@ -141,5 +140,17 @@ module NavigationHelper
       ['Formality Levels', [*resource_chain, :formality_levels]]
     ]
   end
+  
+  def repository_settings_nav(repository, current_page)
+    pages = []
+    chain = resource_chain.last.is_a?(Ontology) ? resource_chain[0..-2] : resource_chain
+    
+    pages << [:"URL catalog",  repository_url_maps_path(repository)]
+    pages << [:errors,           repository_errors_path(repository)]
+    pages << [:permissions,      [*chain, :permissions]] if can? :permissions, repository
+    
+    subnavigation(repository, pages, current_page, [],{}, '/repository_settings/subnav')
+  end
+  
 
 end
