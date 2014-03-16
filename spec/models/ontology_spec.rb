@@ -75,7 +75,7 @@ describe Ontology do
     let!(:ontology) { create :ontology }
     let!(:imported_ontology) do
       imported = create :single_ontology
-      create :import_link, source: ontology, target: imported
+      create :import_link, target: ontology, source: imported
       imported
     end
 
@@ -87,7 +87,7 @@ describe Ontology do
     context 'which have imports themselves' do
       let!(:imported_imported_ontology) do
         imported = create :single_ontology
-        create :import_link, source: imported_ontology, target: imported
+        create :import_link, target: imported_ontology, source: imported
         imported
       end
 
