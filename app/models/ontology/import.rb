@@ -10,6 +10,7 @@ module Ontology::Import
       self.present     = true
       root             = nil
       ontology         = nil
+      ontologies         = []
       logic_callback   = nil
       link             = nil
       ontologies_count = 0
@@ -151,6 +152,7 @@ module Ontology::Import
           ontology.entities.where(conditions).destroy_all
           ontology.sentences.where(conditions).delete_all
           ontology.save!
+          ontologies << ontology
 
           logic_callback.ontology_end({}, ontology)
 
@@ -181,6 +183,7 @@ module Ontology::Import
         }
       save!
       versions.each { |version| version.save! }
+      ontologies.each { |o| o.create_translated_sentences }
 
     end
   end
