@@ -24,9 +24,9 @@ module Hets
       raise DeploymentError, 'Could not find hets'     unless @path
       raise DeploymentError, 'Hets library not found.' unless @library_path
 
-      unless is_compatible? yaml['version_minimum_revision']
-        raise VersionOutdatedError, 'The installed version of Hets is too old'
-      end
+      # unless is_compatible? yaml['version_minimum_revision']
+      #   raise VersionOutdatedError, 'The installed version of Hets is too old'
+      # end
 
       # Set hets environment variables
       %w( hets_lib hets_owl_tools ).each do |key|
