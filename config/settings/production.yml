@@ -8,3 +8,4 @@ exception_notifier:
 git:
   user: 'git'
   group: 'git'
+  verify_url: https://ontohub.org/
