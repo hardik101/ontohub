@@ -9,7 +9,6 @@ module Ontology::Links
 
   module Methods
 
-    DEFAULT_LINK_KIND = 'import'
     
     def iri_for_child(*args)
       proxy_association.owner.iri_for_child(*args)
@@ -25,7 +24,7 @@ module Ontology::Links
       if kind.nil?
         kind = Link::KINDS.find {|k| typename.downcase.include?(k) }
       end
-      kind || DEFAULT_LINK_KIND
+      kind || Link::DEFAULT_LINK_KIND
     end
 
     def update_or_create_from_hash(hash, user, timestamp = Time.now)
@@ -70,8 +69,9 @@ module Ontology::Links
       if hash["map"]
         source = Entity.where(text: hash["map"].first["text"],ontology_id: link.source.id).first
         target = Entity.where(text: hash["map"].second["text"], ontology_id: link.target.id).first
-        entity_mapping = EntityMapping.first_or_initialize(source: source, target: target, link: link)
-        entity_mapping.save!
+        entity_mapping = EntityMapping.
+          where(source_id: source, target_id: target, link_id: link).
+          first_or_create!
       end
     end
   end

@@ -10,6 +10,7 @@ module Ontology::Import
       self.present     = true
       root             = nil
       ontology         = nil
+      ontologies         = []
       logic_callback   = nil
       link             = nil
       ontologies_count = 0
@@ -140,17 +141,16 @@ module Ontology::Import
 
           logic_callback = ParsingCallback.determine_for(ontology)
 
+          ontology.entities.destroy_all
+          ontology.all_sentences.delete_all
           ontology.entities_count  = 0
           ontology.sentences_count = 0
+          ontology.save!
 
           logic_callback.ontology(h, ontology)
         },
         ontology_end: Proc.new {
-          # remove outdated sentences and entities
-          conditions = ['updated_at < ?', now]
-          ontology.entities.where(conditions).destroy_all
-          ontology.sentences.where(conditions).delete_all
-          ontology.save!
+          ontologies << ontology
 
           logic_callback.ontology_end({}, ontology)
 
@@ -172,6 +172,16 @@ module Ontology::Import
             logic_callback.axiom(h, sentence)
           end
         },
+        imported_axiom: Proc.new { |h|
+          if logic_callback.pre_axiom(h)
+            sentence = ontology.sentences.update_or_create_from_hash(h, now)
+            sentence.imported = true
+            sentence.save
+            ontology.sentences_count += 1
+
+            logic_callback.axiom(h, sentence)
+          end
+        },
         link: Proc.new { |h|
           if logic_callback.pre_link(h)
             link = self.links.update_or_create_from_hash(h, user, now)
@@ -181,6 +191,7 @@ module Ontology::Import
         }
       save!
       versions.each { |version| version.save! }
+      ontologies.each { |o| o.create_translated_sentences }
 
     end
   end
