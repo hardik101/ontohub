@@ -18,10 +18,12 @@ class SentencesController < InheritedResources::Base
   end
 
   def collection
-    if logically_translated?
-      Kaminari.paginate_array(parent.all_sentences).page(params[:page])
-    elsif display_all?
-      Kaminari.paginate_array(parent.translated_sentences).page(params[:page])
+    if display_all?
+      if logically_translated?
+        Kaminari.paginate_array(parent.all_sentences).page(params[:page])
+      else
+        Kaminari.paginate_array(parent.translated_sentences).page(params[:page])
+      end
     else
       super
     end
