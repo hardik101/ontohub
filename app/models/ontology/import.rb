@@ -106,7 +106,7 @@ module Ontology::Import
           logic_callback = ParsingCallback.determine_for(ontology)
 
           ontology.entities.destroy_all
-          ontology.all_sentences.delete_all
+          ontology.all_sentences.destroy_all
           ontology.entities_count  = 0
           ontology.sentences_count = 0
           ontology.save!
