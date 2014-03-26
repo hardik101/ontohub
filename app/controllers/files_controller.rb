@@ -4,13 +4,16 @@ class FilesController < ApplicationController
   before_filter :check_write_permissions, only: [:new, :create]
   before_filter :check_read_permissions
 
+  OWL_API_ACCEPT_HEADER = 'application/rdf+xml, application/xml; q=0.5, text/xml; q=0.3, /; q=0.2'
 
   def files
     @info = repository.path_info(params[:path], oid)
 
     raise Repository::FileNotFoundError, path if @info.nil?
 
-    if request.format == 'text/html' || @info[:type] != :file
+    if request.headers['Accept'] == OWL_API_ACCEPT_HEADER
+      send_download(path, oid)
+    elsif request.format == 'text/html' || @info[:type] != :file
       case @info[:type]
       when :file
         @file = repository.read_file(path, oid)
